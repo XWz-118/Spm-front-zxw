@@ -44,10 +44,60 @@
                  </div>
                  <div class="editMessage">
                         <!-- 这里可以修改信息 -->
-
+                        <div class="form-item">
+                            <label for="username">Username:</label>
+                            <input type="text" id="username" v-model="userData.username">
+                            <button @click="editUsername">Edit</button>
+                        </div>
+                        <div class="form-item">
+                            <label for="phone">Tel.:</label>
+                            <input type="text" id="phone" v-model="userData.phone">
+                            <button @click="editPhone">Edit</button>
+                        </div>
+                        <div class="form-item">
+                            <label for="email">email:</label>
+                            <input type="text" id="email" v-model="userData.email">
+                            <button @click="editEmail">Edit</button>
+                        </div>
+                        <div class="form-item">
+                            <label for="password">password:</label>
+                            <input type="password" id="password" v-model="userData.password">
+                            <button @click="editPassword">Edit</button>
+                        </div>
                  </div>
+
+                 <!-- 收货地址 -->
+                <div class="addressbox">
+                    <div class="titlebox">
+                        <span class="title">My Address</span>
+                    </div>
+                    <div v-for="(address, index) in userAddresses" :key="index" class="address-item">
+                        <div class="address-content">
+                            <p>{{ address.address }}</p>
+                        </div>
+                        <div class="address-actions">
+                        <el-button type="primary" @click="editAddress(index)">Edit</el-button>
+                        <el-button type="danger" @click="deleteAddress(index)">Delete</el-button>
+                        </div>
+                    </div>
+                    <div v-if="isAddingAddress" class="add-address-form">
+                    <el-input v-model="newAddress" placeholder="Enter your address"></el-input>
+                    <el-button type="success" @click="addAddress">Add</el-button>
+                    </div>
+                    <el-button v-if="!isAddingAddress" @click="startAddingAddress">Add New Address</el-button>
+                </div>
              </div>
         </div>
+           <!-- 地址编辑对话框 -->
+        <el-dialog v-model="isEditAddress" title="Edit Address">
+        <el-input v-model="editedAddress" placeholder="Enter your address"></el-input>
+        <template #footer>
+            <span class="dialog-footer">
+            <el-button @click="isEditAddress = false">Cancel</el-button>
+            <el-button type="primary" @click="saveEditedAddress">Save</el-button>
+            </span>
+        </template>
+        </el-dialog> 
     </div>
 </template>
 <script setup>
@@ -56,7 +106,8 @@ import Carts from './Carts.vue';
 import Myorders from './Myorders.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-
+import { ElButton, ElInput, ElDialog } from 'element-plus';
+//import axios from 'axios';
 const router =useRouter ();
 
 const handlegobackHome =()=>{
@@ -66,7 +117,7 @@ const gotoCart=()=>{
     router.push('./Carts');
 }
 const gotoOrders=()=>{
-    router.push('./Orders');
+    router.push('./Myorders');
 }
 const gotoPendingpayment=()=>{
     router.push('./'); //路由暂未设计
@@ -74,6 +125,81 @@ const gotoPendingpayment=()=>{
 const gotoAwaitingdeivery=()=>{
     router.push('./');  //路由暂未设计
 }
+
+const userData = ref({
+    username: '',
+    phone: '',
+    email: '',
+    password: ''
+});
+const editUsername = () => {
+
+    console.log('编辑用户名');
+}
+const editPhone = () => {
+    
+    console.log('编辑电话');
+}
+const editEmail = () => {
+    
+    console.log('编辑邮箱');
+}
+const editPassword = () => {
+    
+    console.log('编辑密码');
+}
+//获取信息
+//onMounted(() => {
+//     fetchUserData();
+// });
+// const fetchUserData = async () => {
+//     try {
+//         const response = await axios.get('接口地址'); //
+//         userData.value = response.data;
+//         userAddresses.value=response.data.userAddresses;
+//     } catch (error) {
+//         console.error('获取用户数据失败:', error);
+//     }
+// };
+// 组件挂载时调用获取数据
+// 
+
+const userAddresses = ref([
+  
+]);
+const newAddress = ref('');
+const isAddingAddress = ref(false);
+const isEditAddress = ref(false);
+const editedAddress = ref('');
+const editedAddressIndex = ref(null);
+const addAddress = () => {
+  if (newAddress.value.trim()!== '') {
+    userAddresses.value.push({ address: newAddress.value });
+    newAddress.value = '';
+    isAddingAddress.value = false;
+  }
+};
+
+const deleteAddress = (index) => {
+  userAddresses.value.splice(index, 1);
+};
+
+const editAddress = (index) => {
+  isEditAddress.value = true;
+  editedAddress.value = userAddresses.value[index].address;
+  editedAddressIndex.value = index;
+};
+
+const saveEditedAddress = () => {
+  if (editedAddressIndex.value!== null && editedAddress.value.trim()!== '') {
+    userAddresses.value[editedAddressIndex.value].address = editedAddress.value;
+    isEditAddress.value = false;
+  }
+};
+
+const startAddingAddress = () => {
+  isAddingAddress.value = true;
+};
 
 </script>
 <style scoped>
@@ -115,31 +241,26 @@ const gotoAwaitingdeivery=()=>{
     align-items: center;
 }
 .location-style span {
-    color: white; /* 设置文字颜色为白色 */
+    color: white; 
     text-decoration: none;
     font-size:22px;
 }
-
 
 .Info{
     margin:0 auto;
     height:800px;
     width:1440px;
-    /* background-color: #fcb8ca; */
     display:flex;
     justify-content: center;
 
 }
 .MessageBox{
     margin-top: 30px;
-    /* left: 115px;
-    top: 120px; */
     width: 1211PX;
-    height: 766px;
+    height: 1200px;
     opacity: 1;
     background-color: rgba(229, 229, 229, 0.3);
 }
-
 
 .user{
     margin-left:52px;
@@ -213,10 +334,86 @@ div .toAwaitingdeivery{
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+
 .editMessage{
     margin-left: 303px; 
     width: 843px;
     height: 586px;
-    background-color: #fcb8ca;
+    background-image: url(https://img.js.design/assets/img/67cfdb8607c4c2e467899865.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    border-radius: 50px;
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-around;
+    padding: 20px;
+}
+.form-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.form-item label {
+    display: inline-block;
+    width: 80px;
+    margin-right: 10px;
+    text-align: right;
+    color:white;
+    font-size:34px;
+}
+.form-item input {
+    width: 400px; 
+    height:50px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+.form-item button {
+    width:100px;
+    height:50px;
+    padding: 5px 10px;
+    margin-right: 50px;
+    border: none;
+    background-color: #7dbcff;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size:35px;
+}
+
+.addressbox{
+    margin-top:20px;
+    margin-left:52px;
+    height:400px;
+    width: 1100px;
+    background-image: url(https://img.js.design/assets/img/67cfdb8607c4c2e467899865.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 50px;
+}
+.titlebox {
+  margin-bottom: 10px;
+}
+.title {
+  margin-left: 20px;
+  font-size: 28px;
+  color: white;
+}
+.address-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 10px;
+  border-radius: 10px;
+}
+.address-content p {
+  margin: 0;
+}
+.add-address-form {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
 }
 </style>

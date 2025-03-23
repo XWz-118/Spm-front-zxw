@@ -48,7 +48,8 @@
                 </div>
                 <div class="searchbox">
                     <!-- search输入框 -->
-                    <input type="text" v-model="searchQuery" @input="filterKeywords" placeholder="please input the search key">    
+                    <input type="text" v-model="searchQuery" @input="filterKeywords" @keyup.enter="performSearch" placeholder="please input the search key">    
+                    <button @click="performSearch">Search</button>
                 </div>
                 <!-- keywords推荐词 -->
                 <div class="keyword-area">
@@ -115,6 +116,13 @@ const selectKeyword = (keyword) => {
     searchQuery.value = keyword;
     filteredKeywords.value = [];
     console.log(`搜索关键词: ${keyword}`);
+};
+
+const performSearch = () => {
+    if (searchQuery.value.trim()!== '') {
+        console.log(`开始搜索: ${searchQuery.value}`);
+        // 添加搜索逻辑，:发送请求到后端
+    }
 };
 </script>
 
@@ -253,15 +261,28 @@ const selectKeyword = (keyword) => {
     position: relative; /*保留定位，以便关键词列表定位 */
     width: 504px;
     margin-top: 10px;
+    display: flex;
+    align-items: center;
 }
 
 .searchbox input {
-    width: 100%;
+    flex: 1;
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 10px;
     opacity: 0.8;
+}
+
+.searchbox button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    background-color: #7dbcff;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
 .keyword-area {
