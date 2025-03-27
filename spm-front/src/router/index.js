@@ -9,6 +9,12 @@ import Category3 from '@/views/Category/Category3.vue'
 import Carts from '@/views/Carts.vue'
 import Myorders from '@/views/Myorders.vue'
 import UserMessage from '@/views/UserMessage.vue'
+import Cartscontain from '@/views/Cartscontain.vue'
+import product from '@/views/product.vue'
+import checkout from '@/views/checkout.vue'
+import Myorderscontain from '@/views/Myorderscontain.vue'
+import paymentsuccess from '@/views/paymentsuccess.vue'
+
 const routes = [
   {
     path: '/',
@@ -60,12 +66,38 @@ const routes = [
     path:'/UserMessage',
     name:'UserMessage',
     component:UserMessage
+  },
+  {
+    path:'/Cartscontain',
+    name:'Cartscontain',
+    component:Cartscontain
+  },
+  {
+    path:'/product',
+    name:'product',
+    component:product
+  },
+  {
+    path:'/checkout',
+    name:'checkout',
+    component:checkout
+  },
+  {
+    path:'/Myorderscontain',
+    name:'Myorderscontain',
+    component:Myorderscontain
+  },
+  {
+    path:'/paymentsuccess',
+    name:'paymentsuccess',
+    component:paymentsuccess
   }
 ]
+
+  
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes
 })
-
 export default router
