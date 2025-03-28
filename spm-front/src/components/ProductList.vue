@@ -1,20 +1,23 @@
 <template>
   <div class="product-list">
-    <h2>{{ type === 'hot-products'? 'hot products' : 'discount zone' }}</h2>
+    <h2>{{ type === 'hot-products' ? 'hot products' : 'discount zone' }}</h2>
     <div class="product-container">
       <div class="product-item" v-for="product in getProducts()" :key="product.id">
-        <img :src="product.image" alt="Product Image" />
+        <!-- 添加点击事件 -->
+        <img :src="product.image" alt="Product Image" @click="openModal(product)" />
         <p>{{ product.name }}</p>
         <p>{{ product.price }}</p>
       </div>
     </div>
+    <!-- 当 selectedProduct 不为空时显示模态框 -->
+    <ProductModal v-if="selectedProduct" :product="selectedProduct" @close="closeModal" />
   </div>
 </template>
 
 <script setup>
-import { ref} from 'vue';
+import { ref } from 'vue';
+import ProductModal from './ProductModal.vue';
 import sampleImage from '@/assets/test2.png';
-//import axios frpm 'axios';
 
 const props = defineProps({
   type: {
@@ -97,6 +100,17 @@ const getProducts = () => {
   } else {
     return discountProducts.value.slice(0, 4); // 截取前四个打折商品
   }
+};
+
+// 定义一个响应式变量用于保存点击的当前商品
+const selectedProduct = ref(null);
+
+const openModal = (product) => {
+  selectedProduct.value = product;
+};
+
+const closeModal = () => {
+  selectedProduct.value = null;
 };
 </script>
 
