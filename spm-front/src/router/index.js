@@ -95,7 +95,7 @@ const routes = [
     component:paymentsuccess
   },
   {
-    path: '/searchanddisplay', // 定义 SearchAndDisplay 界面的路径
+    path: '/search', // 定义 SearchAndDisplay 界面的路径
     name: 'SearchAndDisplay',
     component: SearchAndDisplay
   }
