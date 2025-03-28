@@ -3,7 +3,22 @@
     <NavBar />
     <TitleBar />
     <div class="container">
-      <SearchBar @on-search="handleSearch" />
+      <!-- 从 homenew.vue 复制的搜索框结构 -->
+      <div class="searchContainer">
+        <div class="solagan">
+          <span class="Shopping-online">Shopping Online</span>
+        </div>
+        <div class="searchbox">
+          <input type="text" v-model="searchQuery" @input="filterKeywords" @keyup.enter="performSearch" placeholder="please input the search key">    
+          <button @click="performSearch">Search</button>
+        </div>
+        <div class="keyword-area">
+          <span class="keyword-label">Keywords:</span>
+          <span v-for="(keyword, index) in allKeywords" :key="index" class="keyword-item">{{ keyword }}
+            <span v-if="index < allKeywords.length - 1"> </span>
+          </span>
+        </div>
+      </div>
       <ProductList :products="products" @show-product="openProductModal" />
 
       <!-- 显示当前页码 -->
@@ -37,18 +52,17 @@
 import axios from 'axios'
 import NavBar from '../components/NavBar.vue'
 import TitleBar from '../components/TitleBar.vue'
-import SearchBar from '../components/SearchBar.vue'
 import ProductList from '../components/ProductListchen.vue'
 import Pagination from '../components/Pagination.vue'
 import ProductModal from '../components/ProductModal.vue'
 import Footer from '../components/Footer.vue'
+import { ref } from 'vue';
 
 export default {
   name: 'SearchAndDisplay',
   components: {
     NavBar,
     TitleBar,
-    SearchBar,
     ProductList,
     Pagination,
     ProductModal,
@@ -78,6 +92,45 @@ export default {
       limit: 10,
       modalProduct: null
     }
+  },
+  setup() {
+    const searchQuery = ref('');
+    const allKeywords = ref(['手机', '电脑', '平板', '相机', '耳机','...']);
+    const filteredKeywords = ref([]);
+
+    const filterKeywords = () => {
+      if (searchQuery.value === '') {
+        filteredKeywords.value = [];
+      } else {
+        filteredKeywords.value = allKeywords.value.filter(keyword =>
+          keyword.includes(searchQuery.value)
+        );
+      }
+    };
+
+    const selectKeyword = (keyword) => {
+      searchQuery.value = keyword;
+      filteredKeywords.value = [];
+      console.log(`搜索关键词: ${keyword}`);
+    };
+
+    const performSearch = () => {
+      if (searchQuery.value.trim()!== '') {
+        console.log(`开始搜索: ${searchQuery.value}`);
+        this.keyword = searchQuery.value;
+        this.page = 1;
+        this.fetchProducts();
+      }
+    };
+
+    return {
+      searchQuery,
+      allKeywords,
+      filteredKeywords,
+      filterKeywords,
+      selectKeyword,
+      performSearch
+    };
   },
   watch: {
     keyword() {
@@ -137,5 +190,77 @@ export default {
   max-width: 1200px;
   margin: 100px auto 20px;
   padding: 20px;
+}
+
+/* 从 homenew.vue 复制的搜索框样式 */
+.searchContainer {
+  height: 160px;
+  display:flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+}
+
+.solagan {
+  width: 504px;
+  height: 66px;
+  display:flex;
+  justify-content: center;
+  align-items: center; 
+}
+
+.Shopping-online {
+  width:100%;
+  font-size:32px;
+  font-weight: 700;
+  letter-spacing: 0px;
+  line-height: 59.52px;
+  text-align: center;
+  background: linear-gradient(to right, #fcb8ca, #b3faec, #00ddff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.searchbox {
+  position: relative;
+  width: 504px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.searchbox input {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  opacity: 0.8;
+}
+
+.searchbox button {
+  margin-left: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  background-color: #7dbcff;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.keyword-area {
+  color: #6699cc;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.keyword-label {
+  color: #ff6699;
+}
+
+.keyword-item {
+  margin-right: 5px;
 }
 </style>
