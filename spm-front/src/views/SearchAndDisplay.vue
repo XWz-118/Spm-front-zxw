@@ -3,30 +3,55 @@
     <NavBar />
     <TitleBar />
     <div class="container">
-      <SearchBar @on-search="handleSearch" />
-      <ProductList :products="products" @show-product="openProductModal" />
+      <!-- 搜索框部分 -->
+      <div class="searchContainer">
+        <div class="solagan">
+          <span class="Shopping-online">Shopping Online</span>
+        </div>
+        <div class="searchbox">
+          <input
+            type="text"
+            v-model="searchQuery"
+            @input="filterKeywords"
+            @keyup.enter="performSearch"
+            placeholder="please input the search key"
+          />
+          <button @click="performSearch">Search</button>
+        </div>
+        <div class="keyword-area">
+          <span class="keyword-label">Keywords:</span>
+          <span
+            v-for="(keyword, index) in allKeywords"
+            :key="index"
+            class="keyword-item"
+            @click="selectKeyword(keyword)"
+          >
+            {{ keyword }}<span v-if="index < allKeywords.length - 1"> </span>
+          </span>
+        </div>
+      </div>
 
-      <!-- 显示当前页码 -->
+      <!-- 使用与 HomeNew.vue 相同的 ProductList 展示格式，即采用 type="hot-products" -->
+      <ProductList type="hot-products" @show-product="openProductModal" />
+
+      <!-- 分页信息（如果需要） -->
       <div class="page-info">
         <span>当前页码：{{ page }}</span>
       </div>
-
-      <!-- 显示每页显示数量 -->
       <div class="limit-info">
         <span>每页显示数量：{{ limit }}</span>
       </div>
-
-      <Pagination 
-        :currentPage="page" 
-        :totalPages="totalPages" 
-        @page-change="handlePageChange" 
+      <Pagination
+        :currentPage="page"
+        :totalPages="totalPages"
+        @page-change="handlePageChange"
       />
 
-      <!-- 当 modalProduct 不为空时显示悬浮的 ProductModal 组件 -->
-      <ProductModal 
-        v-if="modalProduct" 
-        :product="modalProduct" 
-        @close="closeProductModal" 
+      <!-- 模态产品展示 -->
+      <ProductModal
+        v-if="modalProduct"
+        :product="modalProduct"
+        @close="closeProductModal"
       />
     </div>
     <Footer />
@@ -34,97 +59,89 @@
 </template>
 
 <script>
-import axios from 'axios'
-import NavBar from '../components/NavBar.vue'
-import TitleBar from '../components/TitleBar.vue'
-import SearchBar from '../components/SearchBar.vue'
-import ProductList from '../components/ProductListchen.vue'
-import Pagination from '../components/Pagination.vue'
-import ProductModal from '../components/ProductModal.vue'
-import Footer from '../components/Footer.vue'
+import NavBar from "../components/NavBar.vue";
+import TitleBar from "../components/TitleBar.vue";
+/* 修改为与 HomeNew.vue 中使用的组件保持一致 */
+import ProductList from "../components/ProductList.vue";
+import Pagination from "../components/Pagination.vue";
+import ProductModal from "../components/ProductModal.vue";
+import Footer from "../components/Footer.vue";
+import { ref } from "vue";
 
 export default {
-  name: 'SearchAndDisplay',
+  name: "SearchAndDisplay",
   components: {
     NavBar,
     TitleBar,
-    SearchBar,
     ProductList,
     Pagination,
     ProductModal,
-    Footer
+    Footer,
   },
-  data() {
+  setup() {
+    const searchQuery = ref("");
+    const allKeywords = ref(["手机", "电脑", "平板", "相机", "耳机", "..."]);
+    const filteredKeywords = ref([]);
+
+    const filterKeywords = () => {
+      if (searchQuery.value === "") {
+        filteredKeywords.value = [];
+      } else {
+        filteredKeywords.value = allKeywords.value.filter((keyword) =>
+          keyword.includes(searchQuery.value)
+        );
+      }
+    };
+
+    const selectKeyword = (keyword) => {
+      searchQuery.value = keyword;
+      filteredKeywords.value = [];
+      console.log(`搜索关键词: ${keyword}`);
+    };
+
+    const performSearch = () => {
+      if (searchQuery.value.trim() !== "") {
+        console.log(`开始搜索: ${searchQuery.value}`);
+        // 如果需要，可在这里触发 ProductList 内部的数据刷新逻辑
+      }
+    };
+
+    // 分页相关数据
+    const page = ref(1);
+    const totalPages = ref(1);
+    const limit = ref(10);
+
+    // 控制产品模态展示
+    const modalProduct = ref(null);
+    const openProductModal = (product) => {
+      modalProduct.value = product;
+    };
+    const closeProductModal = () => {
+      modalProduct.value = null;
+    };
+
+    const handlePageChange = (newPage) => {
+      page.value = newPage;
+      // 如果 ProductList 组件依赖分页数据，可以在这里通知其更新数据
+    };
+
     return {
-      products: [
-        {
-          id: 1,
-          name: "示例商品 1",
-          description: "这是一个示例商品。这里是产品介绍，型号，尺寸等信息。",
-          price: 99.9,
-          imageUrl: "https://tse4-mm.cn.bing.net/th/id/OIP-C.Uml0Hq_D3cM1W7_C_2ptWwHaJ4?rs=1&pid=ImgDetMain"
-        },
-        {
-          id: 2,
-          name: "示例商品 2",
-          description: "这是另一个示例商品。",
-          price: 149.9,
-          imageUrl: "https://imgservice.suning.cn/uimg1/b2c/image/_g6Xm7MgaE0Hbn5zC_rnCw.png"
-        }
-      ],
-      keyword: '',
-      page: 1,
-      totalPages: 1,
-      limit: 10,
-      modalProduct: null
-    }
+      searchQuery,
+      allKeywords,
+      filteredKeywords,
+      filterKeywords,
+      selectKeyword,
+      performSearch,
+      page,
+      totalPages,
+      limit,
+      modalProduct,
+      openProductModal,
+      closeProductModal,
+      handlePageChange,
+    };
   },
-  watch: {
-    keyword() {
-      this.fetchProducts()
-    },
-    page() {
-      this.fetchProducts()
-    }
-  },
-  methods: {
-    handleSearch(newKeyword) {
-      this.keyword = newKeyword
-      this.page = 1 // 搜索时重置页码
-    },
-    handlePageChange(newPage) {
-      this.page = newPage
-    },
-    openProductModal(product) {
-      this.modalProduct = product
-    },
-    closeProductModal() {
-      this.modalProduct = null
-    },
-    fetchProducts() {
-      axios.get('/api/products', {
-        params: {
-          keyword: this.keyword,
-          page: this.page,
-          limit: this.limit
-        },
-        headers: {
-          Authorization: process.env.VUE_APP_AUTH_TOKEN
-        }
-      })
-      .then(response => {
-        this.products = response.data.data.results;
-        // 根据实际返回设置 totalPages
-      })
-      .catch(error => {
-        console.error('获取商品数据失败:', error);
-      });
-    }
-  },
-  mounted() {
-    this.fetchProducts()
-  }
-}
+};
 </script>
 
 <style scoped>
@@ -138,4 +155,79 @@ export default {
   margin: 100px auto 20px;
   padding: 20px;
 }
+
+/* 搜索框样式 */
+.searchContainer {
+  height: 160px;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+}
+
+.solagan {
+  width: 504px;
+  height: 66px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Shopping-online {
+  width: 100%;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0px;
+  line-height: 59.52px;
+  text-align: center;
+  background: linear-gradient(to right, #fcb8ca, #b3faec, #00ddff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.searchbox {
+  position: relative;
+  width: 504px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.searchbox input {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  opacity: 0.8;
+}
+
+.searchbox button {
+  margin-left: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  background-color: #7dbcff;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.keyword-area {
+  color: #6699cc;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.keyword-label {
+  color: #ff6699;
+}
+
+.keyword-item {
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+/* 分页及产品列表等其他样式可依据实际需求调整 */
 </style>

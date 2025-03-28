@@ -14,6 +14,8 @@ import product from '@/views/product.vue'
 import checkout from '@/views/checkout.vue'
 import Myorderscontain from '@/views/Myorderscontain.vue'
 import paymentsuccess from '@/views/paymentsuccess.vue'
+import SearchAndDisplay from '../views/SearchAndDisplay.vue' // 导入 SearchAndDisplay 组件
+
 
 const routes = [
   {
@@ -91,6 +93,11 @@ const routes = [
     path:'/paymentsuccess',
     name:'paymentsuccess',
     component:paymentsuccess
+  },
+  {
+    path: '/search', // 定义 SearchAndDisplay 界面的路径
+    name: 'SearchAndDisplay',
+    component: SearchAndDisplay
   }
 ]
 

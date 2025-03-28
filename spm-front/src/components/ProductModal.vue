@@ -4,7 +4,8 @@
     <div class="modal-content">
       <!-- 左侧图片区，展示产品图片 -->
       <div class="modal-image">
-        <img :src="product.imageUrl" alt="Product Image" />
+        <!-- 修改绑定属性 -->
+        <img :src="product.image" alt="Product Image" />
       </div>
       <!-- 右侧详情区，展示产品名称、价格、介绍和操作按钮 -->
       <div class="modal-details">
@@ -244,4 +245,4 @@ export default {
 .btn-cart:hover {
   background-color: #43a047;
 }
-</style>    
+</style>
